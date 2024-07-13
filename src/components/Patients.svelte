@@ -6,6 +6,7 @@
   import {selectedFHIRServer} from '../stores/loading';
   import {patients} from '../stores/loading';
   import { patientsPerPage } from '../stores/loading';
+  import { SvelteToast, toast } from '@zerodevx/svelte-toast';
 
   import { get } from 'svelte/store';
 
@@ -50,6 +51,11 @@ function updatePerPage(event) {
       const serverUrl = get(selectedFHIRServer);
       console.log (`fetching ${$patientsPerPage} patients offset ${offset}`);
       const response = await fetch(`${serverUrl}/Patient?_format=json&_count=${$patientsPerPage}&_getpagesoffset=${offset}`);
+
+      if (!response.ok) {
+    // Handle HTTP errors
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
       const data = await response.json();
       if (data.entry) {
         patients.set(data.entry.map(entry => entry.resource));  // Use set method
@@ -59,6 +65,7 @@ function updatePerPage(event) {
       console.log(`Fetched ${get(patients).length} patients`);
     } catch (error) {
       console.error('Failed to fetch patients:', error);
+      toast.push(error.message);
     }
     isLoading.set(false);
   }

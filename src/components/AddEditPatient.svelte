@@ -4,6 +4,8 @@
     import { isLoading } from '../stores/loading';
     import { selectedFHIRServer } from '../stores/loading'; 
     import { get } from 'svelte/store';
+    import { SvelteToast, toast } from '@zerodevx/svelte-toast';
+
 
     export let selectedPatient = null;
     
@@ -191,6 +193,8 @@
         gender = '';
         dob = '';
         phone = '';
+        console.log ('response', response);
+        toast.push ('Success!');
       } catch (error) {
         console.error('Error:', error);
       }
@@ -202,6 +206,7 @@
     }
   </script>
   
+  <SvelteToast />
   <form on:submit|preventDefault={handleSubmit}>
     <div>
       <label for="name">Name:</label>

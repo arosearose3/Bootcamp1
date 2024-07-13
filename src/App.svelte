@@ -4,6 +4,7 @@
 <script>
 
   import Nav from './components/Nav.svelte';
+  import { SvelteToast } from '@zerodevx/svelte-toast';
 
   let currentView = 'patients';
 </script>
@@ -13,4 +14,5 @@
 
 <main>
   <slot></slot>
+  <SvelteToast />
 </main>

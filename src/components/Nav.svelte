@@ -35,12 +35,13 @@
     background-color: #e6d8d8;
     padding: 1em;
     display: flex;
-    flex-direction: column; /* Stack items vertically */
+    flex-direction: row; /* Stack items vertically */
     align-items: flex-start; /* Align items to the start */
     color: white; /* Ensures all text within nav has a white color */
   }
 
   .loading-indicator-container {
+    padding: 10px 50px;
     height: 50px; /* Set a fixed height */
     display: flex;
     align-items: center;
@@ -49,23 +50,23 @@
 
   .nav-buttons {
     display: flex;
-    gap: 1em; /* Space between buttons */
     margin-top: 1em; /* Space above buttons */
   }
 
   button {
+ 
     font-family: 'Roboto', sans-serif;
     background-color: grey;
     border: none;
     color: white;
-    padding: 10px 20px;
+    padding: 10px 50px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
-    margin: 4px 2px;
+    margin: 4px 1px;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 0px;
     transition: background-color 0.3s, color 0.3s;
   }
 
