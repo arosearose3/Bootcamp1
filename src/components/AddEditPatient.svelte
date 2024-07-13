@@ -4,7 +4,7 @@
     import { isLoading } from '../stores/loading';
     import { selectedFHIRServer } from '../stores/loading'; 
     import { get } from 'svelte/store';
-    
+
     export let selectedPatient = null;
     
 // if selectedPatient comes in null, Add New, 
@@ -211,7 +211,7 @@
       {/if}
     </div>
   
-    <div>
+    <div class="fhir-dropdown" >
       <label for="gender">Gender:</label>
       <select id="gender" bind:value={gender}>
         <option value="male">Male</option>

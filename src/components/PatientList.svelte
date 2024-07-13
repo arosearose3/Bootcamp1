@@ -1,13 +1,30 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  export let patients = [];
+
+  export let patientList = [];
   const dispatch = createEventDispatcher();
 
   let sortedPatients = [];
   let sortColumn = 'name';
   let sortDirection = 'asc';
+  let isDragging = false;
 
-  $: sortedPatients = sortPatients(patients, sortColumn, sortDirection);
+function handleMouseDown() {
+  isDragging = false;
+}
+
+function handleMouseMove() {
+  isDragging = true;
+}
+
+function handleMouseUp(patient) {
+  if (!isDragging) {
+    editPatient(patient);
+  }
+  isDragging = false;
+}
+
+  $: sortedPatients = sortPatients(patientList, sortColumn, sortDirection);
 
   function sortPatients(patients, column, direction) {
     return [...patients].sort((a, b) => {
@@ -63,26 +80,64 @@
     dispatch('edit', patient);
   }
 
-  function getSortIndicator(column) {
-    if (column === sortColumn) {
-      return sortDirection === 'asc' ? '↑' : '↓';
-    }
-    return '';
-  }
+
+
+  
 </script>
 
 <table>
   <thead>
     <tr>
-      <th on:click={() => sortBy('name')}>Name {getSortIndicator('name')}</th>
-      <th on:click={() => sortBy('gender')}>Gender {getSortIndicator('gender')}</th>
-      <th on:click={() => sortBy('dob')}>DOB {getSortIndicator('dob')}</th>
-      <th on:click={() => sortBy('phone')}>Phone {getSortIndicator('phone')}</th>
+      <th on:click={() => sortBy('name')}>
+        Name
+        {#if sortColumn === 'name'}
+          {#if sortDirection === 'asc'}
+            ↑
+          {:else}
+            ↓
+          {/if}
+        {/if}
+      </th>
+      <th on:click={() => sortBy('gender')}>
+        Gender
+        {#if sortColumn === 'gender'}
+          {#if sortDirection === 'asc'}
+            ↑
+          {:else}
+            ↓
+          {/if}
+        {/if}
+      </th>
+      <th on:click={() => sortBy('dob')}>
+        DOB
+        {#if sortColumn === 'dob'}
+          {#if sortDirection === 'asc'}
+            ↑
+          {:else}
+            ↓
+          {/if}
+        {/if}
+      </th>
+      <th on:click={() => sortBy('phone')}>
+        Phone
+        {#if sortColumn === 'phone'}
+          {#if sortDirection === 'asc'}
+            ↑
+          {:else}
+            ↓
+          {/if}
+        {/if}
+      </th>
     </tr>
   </thead>
   <tbody>
     {#each sortedPatients as patient}
-      <tr on:click={() => editPatient(patient)} class="patient-row">
+      <tr 
+        on:mousedown={handleMouseDown}
+        on:mousemove={handleMouseMove}
+        on:mouseup={() => handleMouseUp(patient)}
+        class="patient-row"
+      >
         <td>{getColumnValue(patient, 'name')}</td>
         <td>{getColumnValue(patient, 'gender')}</td>
         <td>{getColumnValue(patient, 'dob')}</td>

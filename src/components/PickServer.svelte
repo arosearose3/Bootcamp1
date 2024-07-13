@@ -4,16 +4,18 @@
     
     // List of URLs from the HL7 FHIR Public Test Servers page
     const fhirServers = [
-      { name: "Argonaut", url: "https://api-v8-r4.hspconsortium.org/argonaut/v8" },
-      { name: "* HAPI FHIR R4", url: "http://hapi.fhir.org/baseR4" },
-      { name: "Mayo Clinic FHIR", url: "https://api.mayo.edu/fhir/r4" },
-      { name: "Inferno Community", url: "https://inferno.healthit.gov/community" },
-      { name: "* Smart Health IT", url: "https://r3.smarthealthit.org" },
-      { name: "Cerner Millennium", url: "https://fhir.cerner.com/millennium/r4/1" },
-      { name: "Epic USCDI R4", url: "https://open.epic.com/MyApps/Endpoints/USCDI/R4" },
-      { name: "Google Healthcare API", url: "https://healthcare.googleapis.com/v1/projects/project-id/locations/location/datasets/dataset/fhirStores/fhir-store/fhir" },
-      { name: "IBM FHIR Server", url: "https://ibm.github.io/FHIR" },
-      { name: "Microsoft FHIR Server for Azure", url: "https://github.com/microsoft/fhir-server" }
+    { name: "HAPI FHIR R4", url: "http://hapi.fhir.org/baseR4" },
+  //  { name: "Inferno Community", url: "https://inferno.healthit.gov/community" },
+    { name: "Smart Health IT", url: "https://r3.smarthealthit.org" },
+
+
+//{ name: "Health Samurai's FHIR Server", url: "https://health-samurai.io/aidbox" },
+    { name: "AEGIS WildFHIR R4", url: "https://wildfhir4.aegis.net/fhir4-0-1" },
+    { name: "AEGIS WildFHIR STU3", url: "https://wildfhir3.aegis.net/fhir3-0-2" },
+    { name: "AEGIS WildFHIR DSTU2", url: "https://wildfhir2.aegis.net/fhir1-0-2" },
+    { name: "NLM's HAPI FHIR DSTU3", url: "https://lforms-fhir.nlm.nih.gov/baseDstu3" },
+    { name: "NLM's HAPI FHIR R4", url: "https://lforms-fhir.nlm.nih.gov/baseR4" }
+  
     ];
   
     let selectedServer = fhirServers[0].url;
@@ -27,51 +29,7 @@
   </script>
   
   <style>
-  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-.fhir-dropdown {
-  margin: 20px;
-  padding: 10px;
-  border: 0px solid #ddd;
-  border-radius: 10px;
-  background-color: #f9f9f9;
-}
-
-.fhir-dropdown label {
-  font-weight: bold;
-  color: #333;
-}
-
-.fhir-dropdown select {
-  font-family: 'Roboto', sans-serif;
-  background-color: grey;
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  text-align: left;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.3s, color 0.3s;
-}
-
-.fhir-dropdown select:hover {
-  background-color: lightyellow;
-  color: darkgrey;
-}
-
-.fhir-dropdown select:active {
-  background-color: yellow;
-  color: darkgrey;
-}
-
-.fhir-dropdown p {
-  margin-top: 10px;
-  color: #750f0f;
-}
   </style>
   
   <div class="fhir-dropdown">

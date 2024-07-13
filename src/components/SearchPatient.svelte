@@ -1,6 +1,9 @@
 <script>
-	import PatientList from "./PatientList.svelte";
+  import PatientList from "./PatientList.svelte";
+  import VSACtest from './VSACtest.svelte';
   import { isLoading } from '../stores/loading';
+  import { selectedFHIRServer } from '../stores/loading';
+  import { get } from 'svelte/store';
 
   let name = '';
   let phone = '';
@@ -30,7 +33,8 @@
 
   async function search() {
     try {
-      let urlBase = 'https://hapi.fhir.org/baseR4/Patient?';
+      const serverUrl = get(selectedFHIRServer);
+      let urlBase = `${serverUrl}/Patient?`;
       const nameParts = name.trim().split(' ');
 
       let familyName = '';
@@ -49,15 +53,18 @@
           url += `family=${encodeURIComponent(familyName)}&`;
         }
       } else if (nameParts.length === 1) {
-        // If only one part, treat it as both given and family name
-        givenNames = familyName = nameParts[0];
+        // If only one part, perform two searches: one for given name and one for family name
+        familyName = nameParts[0];
 
-        if (givenNames) {
-          url += `given=${encodeURIComponent(givenNames)}&`;
-        }
-        if (familyName) {
-          url += `family=${encodeURIComponent(familyName)}&`;
-        }
+        let urlGiven = `${urlBase}given=${encodeURIComponent(familyName)}`;
+        let urlFamily = `${urlBase}family=${encodeURIComponent(familyName)}`;
+
+        results = []; // Clear previous results
+        isLoading.set(true);
+        await fetchBatch(urlGiven);
+        await fetchBatch(urlFamily);
+        isLoading.set(false);
+        return;
       }
 
       if (phone) {
@@ -80,17 +87,26 @@
       await fetchBatch(nextBatchUrl);
     }
   }
+
+  function handleKeydown(event) {
+    if (event.key === 'Enter') {
+      search();
+    }
+  }
 </script>
 
+<!-- <VSACtest /> -->
+<!-- <br> -->
+
 <div>
-  <input type="text" placeholder="Enter Name" bind:value={name} />
-  <input type="text" placeholder="Enter Phone" bind:value={phone} />
+  <input type="text" placeholder="Enter Name" bind:value={name} on:keydown={handleKeydown} />
+  <input type="text" placeholder="Enter Phone" bind:value={phone} on:keydown={handleKeydown} />
   <button on:click={search}>Search</button>
   <button on:click={fetchNextBatch} disabled={!nextBatchUrl}>Next Batch</button>
 
   <div>
     {#if results.length > 0}
-      <PatientList patients={results} />
+      <PatientList patientList={results} />
     {:else}
       <p>No patients found</p>
     {/if}

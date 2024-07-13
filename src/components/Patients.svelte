@@ -4,39 +4,59 @@
   import { onMount, createEventDispatcher } from 'svelte';
   import { isLoading } from '../stores/loading';
   import {selectedFHIRServer} from '../stores/loading';
+  import {patients} from '../stores/loading';
+  import { patientsPerPage } from '../stores/loading';
+
   import { get } from 'svelte/store';
 
   export let forceView = 'patients'; // Accept the forceView prop
 
-  let patients = [];
+    // Initialize the local variable to the store's value
+    let perPage;
+
+    $: perPage = $patientsPerPage;
+
+// Function to handle dropdown value change
+function updatePerPage(event) {
+  const value = parseInt(event.target.value);
+  patientsPerPage.set(value);
+
+}
+
+
   let currentComponent = forceView;
   let selectedPatient = null;
   let buttonText = 'Add Patient'; // Initial button text
   let totalPatients = 0;
-  let patientsPerPage = 12;
+//  let patientsPerPage = 12;
   let currentPage = 0;
 
   const dispatch = createEventDispatcher();
 
   onMount(() => {
-    fetchPatients(currentPage);
-    if (totalPatients == 0) get_patient_count();
+    perPage = $patientsPerPage;
+    //fetchPatients(currentPage);
+    //if (totalPatients == 0) get_patient_count();
   });
 
   async function fetchPatients(page) {
-    const offset = page * patientsPerPage;
+    const offset = page * $patientsPerPage;
     console.log(`Fetching patients from offset ${offset}`);
     isLoading.set(true);
+    if (totalPatients === 0 || totalPatients === undefined) {
+      get_patient_count();
+    }
     try {
       const serverUrl = get(selectedFHIRServer);
-      const response = await fetch(`${serverUrl}/Patient?_count=${patientsPerPage}&_getpagesoffset=${offset}`);
-     const data = await response.json();
+      console.log (`fetching ${$patientsPerPage} patients offset ${offset}`);
+      const response = await fetch(`${serverUrl}/Patient?_format=json&_count=${$patientsPerPage}&_getpagesoffset=${offset}`);
+      const data = await response.json();
       if (data.entry) {
-        patients = data.entry.map(entry => entry.resource);
+        patients.set(data.entry.map(entry => entry.resource));  // Use set method
       } else {
-        patients = [];
+        patients.set([]);  // Use set method
       }
-      console.log(`Fetched ${patients.length} patients`);
+      console.log(`Fetched ${get(patients).length} patients`);
     } catch (error) {
       console.error('Failed to fetch patients:', error);
     }
@@ -58,15 +78,20 @@
   }
 
   function goToNextPage() {
-    console.log('next page, current, total, ppp', currentPage, totalPatients, patientsPerPage);
-    if ((currentPage + 1) * patientsPerPage < totalPatients) {
+    console.log('next page, current, total, ppp', currentPage, totalPatients, $patientsPerPage);
+    if ((currentPage + 1) * $patientsPerPage < totalPatients) {
       currentPage += 1;
       fetchPatients(currentPage);
     }
+    if (totalPatients === 0) fetchPatients(0 );
+
   }
 
   function goToLastPage() {
-    currentPage = Math.floor(9999 / patientsPerPage);
+    if (totalPatients >9999) {
+    currentPage = Math.floor(9999 / patientsPerPage);}
+    else {currentPage = Math.floor(totalPatients / patientsPerPage); }
+
     console.log('last page, current, total, ppp', currentPage, totalPatients, patientsPerPage);
 
 
@@ -77,7 +102,7 @@
     isLoading.set(true);
     try {
       const serverUrl = get(selectedFHIRServer);
-      const response = await fetch(`${serverUrl}/Patient?active=true&_total=accurate&_count=1`);
+      const response = await fetch(`${serverUrl}/Patient?_format=json&_active=true&_total=accurate&_count=1`);
       const data = await response.json();
       totalPatients = data.total;
     } catch (error) {
@@ -109,25 +134,38 @@
 </script>
 
 <div>
-  <div class="header">
-    Click a row to update Patient,
-    Total Patients: {totalPatients}
-  
-    <div class="refresh-button">
-      <button on:click={get_patient_count}>Refresh Count</button>
-    </div>
+ 
+<div class="header">
+  <span>Click a row to update Patient, Total Patients: {totalPatients}</span>
+  <div class="refresh-button">
+    <button on:click={get_patient_count}>Refresh Count</button>
   </div>
+
+</div>
 
   {#if currentComponent === 'patients'}
     <button on:click={addPatient}>{buttonText}</button> <!-- Use buttonText for the button label -->
     <br>
-    <div class="pagination-controls">
-      <button on:click={goToFirstPage}>Start</button>
-      <button on:click={goToPreviousPage}>Previous 12</button>
-      <button on:click={goToNextPage}>Next 12</button>
-      <button on:click={goToLastPage}>End</button>
+    <div>
+      <div class="pagination-controls">
+        <button on:click={goToFirstPage}>First</button>
+        <button on:click={goToPreviousPage}>Previous {$patientsPerPage}</button>
+        <button on:click={goToNextPage}>Next {$patientsPerPage}</button>
+        <button on:click={goToLastPage}>Last</button>
+      </div>
+      <div class="fhir-dropdown">
+        <label for="patientsPerPage">Patients per page</label>
+        <select id="patientsPerPage" bind:value={$patientsPerPage}>
+          <option value="12">12</option>
+          <option value="48">48</option>
+          <option value="108">108</option>
+        </select>
+      </div>
+      
+
     </div>
-    <PatientList {patients} on:edit={editPatient} />
+    <PatientList patientList ={$patients} on:edit={editPatient} />
+   
 
   {:else if currentComponent === 'addEditPatient'}
     <AddEditPatient on:submit={handlePatientSubmit} on:cancel={handleCancel}  {selectedPatient} />
@@ -145,9 +183,18 @@
 
 
   .header {
-    display: flex;
-    flex-direction: column;
     margin-bottom: 1em;
+    display: flex;
+    align-items: center; /* Center vertically */
+    justify-content: space-between; /* Add space between text and button */
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 0px solid #ddd;
+    border-radius: 5px;
+  }
+
+  .refresh-button {
+    margin-left: 10px; /* Space between text and button */
   }
   .spacer {
     flex-grow: 1;
@@ -166,7 +213,7 @@
   }
 
   button {
-    margin-bottom: 1em;
-    margin-right: 1em; /* Ensure space between buttons */
+    margin-bottom: 1px;
+    margin-right: 1px; /* Ensure space between buttons */
   }
 </style>
