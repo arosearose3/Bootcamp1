@@ -1,5 +1,5 @@
 
-
+<link rel="stylesheet" href="../global.css">
 <script>
   import Patients from '../components/Patients.svelte';
   import SearchPatient from '../components/SearchPatient.svelte';

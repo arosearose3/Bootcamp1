@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+body {
+  font-family: 'Roboto', sans-serif; /* Specify the font here */
+}
+
+button {
+  font-family: 'Roboto', sans-serif;
+  background-color: grey;
+  border: none;
+  color: white;
+  padding: 5px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: lightyellow;
+  color: darkgrey;
+}
+
+button:active {
+  background-color: yellow;
+  color: darkgrey;
+}
+
+input {
+  font-family: 'Roboto', sans-serif;
+  background-color: grey;
+  border: none;
+  color: white;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 4px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+input:hover {
+  background-color: lightyellow;
+  color: darkgrey;
+}
+
+input:focus {
+  background-color: yellow;
+  color: darkgrey;
+  outline: none; /* Removes the default focus outline */
+}
+
+input::placeholder {
+  color: lightgrey; /* Sets the hint text color */
+}
+
+nav {
+  background-color: #333;
+  padding: 1em;
+  display: flex;
+  align-items: center;
+  color: white; /* Ensures all text within nav has a white color */
+  font-family: 'Roboto', sans-serif; /* Specify the font here */
+}
+
+nav a {
+  color: white;
+  margin-right: 1em;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+

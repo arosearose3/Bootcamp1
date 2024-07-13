@@ -1,9 +1,10 @@
 <script>
   import PatientList from './PatientList.svelte';
   import AddEditPatient from './AddEditPatient.svelte';
-  import PickServer from './PickServer.svelte';
   import { onMount, createEventDispatcher } from 'svelte';
   import { isLoading } from '../stores/loading';
+  import {selectedFHIRServer} from '../stores/loading';
+  import { get } from 'svelte/store';
 
   export let forceView = 'patients'; // Accept the forceView prop
 
@@ -27,8 +28,9 @@
     console.log(`Fetching patients from offset ${offset}`);
     isLoading.set(true);
     try {
-      const response = await fetch(`http://hapi.fhir.org/baseR4/Patient?_count=${patientsPerPage}&_getpagesoffset=${offset}`);
-      const data = await response.json();
+      const serverUrl = get(selectedFHIRServer);
+      const response = await fetch(`${serverUrl}/Patient?_count=${patientsPerPage}&_getpagesoffset=${offset}`);
+     const data = await response.json();
       if (data.entry) {
         patients = data.entry.map(entry => entry.resource);
       } else {
@@ -74,7 +76,8 @@
   async function get_patient_count() {
     isLoading.set(true);
     try {
-      const response = await fetch('http://hapi.fhir.org/baseR4/Patient?active=true&_total=accurate&_count=1');
+      const serverUrl = get(selectedFHIRServer);
+      const response = await fetch(`${serverUrl}/Patient?active=true&_total=accurate&_count=1`);
       const data = await response.json();
       totalPatients = data.total;
     } catch (error) {
@@ -107,10 +110,14 @@
 
 <div>
   <div class="header">
+    Click a row to update Patient,
+    Total Patients: {totalPatients}
   
-    <label>Total Patients: {totalPatients}</label>
-    <button on:click={get_patient_count}>Refresh Count</button>
+    <div class="refresh-button">
+      <button on:click={get_patient_count}>Refresh Count</button>
+    </div>
   </div>
+
   {#if currentComponent === 'patients'}
     <button on:click={addPatient}>{buttonText}</button> <!-- Use buttonText for the button label -->
     <br>
@@ -121,6 +128,7 @@
       <button on:click={goToLastPage}>End</button>
     </div>
     <PatientList {patients} on:edit={editPatient} />
+
   {:else if currentComponent === 'addEditPatient'}
     <AddEditPatient on:submit={handlePatientSubmit} on:cancel={handleCancel}  {selectedPatient} />
   {/if}
@@ -135,10 +143,17 @@
     margin-bottom: 1em;
   }
 
+
   .header {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     margin-bottom: 1em;
+  }
+  .spacer {
+    flex-grow: 1;
+  }
+  .refresh-button {
+    text-align: left;
   }
 
   .header label {

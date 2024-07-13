@@ -2,7 +2,9 @@
     import { createEventDispatcher } from 'svelte';
     import { onMount } from 'svelte';
     import { isLoading } from '../stores/loading';
-
+    import { selectedFHIRServer } from '../stores/loading'; 
+    import { get } from 'svelte/store';
+    
     export let selectedPatient = null;
     
 // if selectedPatient comes in null, Add New, 
@@ -154,7 +156,8 @@
       isLoading.set(true);
       try {
         if (selectedPatient) {
-          response = await fetch(`https://hapi.fhir.org/baseR4/Patient/${patientID}`, {
+          const serverUrl = get(selectedFHIRServer);
+          response = await fetch(`${serverUrl}/Patient/${patientID}`, {
           
           method: 'PUT',
           headers: {
@@ -164,7 +167,8 @@
         }); } 
         
         else {
-        response = await fetch('https://hapi.fhir.org/baseR4/Patient', {
+          const serverUrl = get(selectedFHIRServer);
+        response = await fetch(`${serverUrl}/Patient`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/fhir+json'
@@ -241,6 +245,7 @@
     </form>
     
     <style>
+
       form {
         max-width: 400px;
         margin: 0 auto;
