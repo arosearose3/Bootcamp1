@@ -4,7 +4,7 @@
     let result = '';
     const svsServerBase = 'https://vsac.nlm.nih.gov/vsac/svs/';
     const username = 'arosearose'; 
-    const password = '34ea63e5-6bd1-4963-bede-24866d3deff9'; 
+    const password = ''; 
   
     async function fetchData() {
       try {
