@@ -1,6 +1,15 @@
 # features 
 Patient Add/Edit is a single component.  'Success' toast. Validation. Given and Family names. Cancel Button. Loading Indicator. Dropdown for Gender. 
 
+Choose from multiple public FHIR servers. 
+
+PatientList displays list of patients in a sortable table.  Click column headers to sort or revese sort.  Supports drag-select.  Click row to Edit patient. Sort column indicator. 
+
+Variable Patients Per Page, with dropdown selector.  Pagination. Loading Indicator. Update Patient Total Count. 
+
+Search name w/o phone, phone w/o name, given and family name, a single name searches both given and family. 
+
+
 
 # create-svelte
 
