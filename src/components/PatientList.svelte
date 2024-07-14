@@ -1,5 +1,8 @@
 <script>
   import { createEventDispatcher } from 'svelte';
+  import { isLoading } from '../stores/loading';
+  import {selectedFHIRServer} from '../stores/loading';
+  import {get} from 'svelte/store'; 
 
   export let patientList = [];
   const dispatch = createEventDispatcher();
@@ -9,20 +12,20 @@
   let sortDirection = 'asc';
   let isDragging = false;
 
-function handleMouseDown() {
-  isDragging = false;
-}
-
-function handleMouseMove() {
-  isDragging = true;
-}
-
-function handleMouseUp(patient) {
-  if (!isDragging) {
-    editPatient(patient);
+  function handleMouseDown() {
+    isDragging = false;
   }
-  isDragging = false;
-}
+
+  function handleMouseMove() {
+    isDragging = true;
+  }
+
+  function handleMouseUp(patient) {
+    if (!isDragging) {
+      editPatient(patient);
+    }
+    isDragging = false;
+  }
 
   $: sortedPatients = sortPatients(patientList, sortColumn, sortDirection);
 
@@ -30,7 +33,7 @@ function handleMouseUp(patient) {
     return [...patients].sort((a, b) => {
       let aValue = getColumnValue(a, column);
       let bValue = getColumnValue(b, column);
-      
+
       if (aValue < bValue) {
         return direction === 'asc' ? -1 : 1;
       } else if (aValue > bValue) {
@@ -80,10 +83,31 @@ function handleMouseUp(patient) {
     dispatch('edit', patient);
   }
 
+  async function deletePatient(patient) {
+    const serverUrl = get(selectedFHIRServer);
+    try {
+      const response = await fetch(`${serverUrl}/Patient/${patient.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/fhir+json'
+        },
+      });
 
-
-  
+      if (response.ok) {
+        // Remove the patient from the local list after successful deletion
+        patientList = patientList.filter(p => p.id !== patient.id);
+        dispatch('delete', patient);
+      } else {
+        console.error('Failed to delete patient:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('Error deleting patient:', error);
+    }
+  }
 </script>
+
+
+
 
 <table>
   <thead>
@@ -128,6 +152,7 @@ function handleMouseUp(patient) {
           {/if}
         {/if}
       </th>
+      <th>Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -142,6 +167,11 @@ function handleMouseUp(patient) {
         <td>{getColumnValue(patient, 'gender')}</td>
         <td>{getColumnValue(patient, 'dob')}</td>
         <td>{getColumnValue(patient, 'phone')}</td>
+        <td>
+          <button on:click={() => deletePatient(patient)}>
+            🗑️
+          </button>
+        </td>
       </tr>
     {/each}
   </tbody>
@@ -175,5 +205,15 @@ function handleMouseUp(patient) {
 
   .sort-indicator {
     margin-left: 5px;
+  }
+
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  button:hover {
+    color: red;
   }
 </style>

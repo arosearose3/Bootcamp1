@@ -10,6 +10,8 @@
   let results = [];
   let nextBatchUrl = null; // Store the URL for the next batch of results
 
+  let nameParts = [];
+
   async function fetchBatch(url) {
     isLoading.set(true);
     const response = await fetch(url);
@@ -35,7 +37,7 @@
     try {
       const serverUrl = get(selectedFHIRServer);
       let urlBase = `${serverUrl}/Patient?`;
-      const nameParts = name.trim().split(' ');
+       nameParts = name.trim().split(' ');
 
       let familyName = '';
       let givenNames = '';
@@ -52,7 +54,7 @@
         if (familyName) {
           url += `family=${encodeURIComponent(familyName)}&`;
         }
-      } else if (nameParts.length === 1) {
+      } else if (nameParts.length === 1 && nameParts[0] != '') {
         // If only one part, perform two searches: one for given name and one for family name
         familyName = nameParts[0];
 
@@ -99,6 +101,8 @@
 <!-- <br> -->
 
 <div>
+<!--   nameparts[0]="{nameParts[0]}"<br>
+  nameparts.length = {nameParts.length}<br> -->
   <input type="text" placeholder="Enter Name" bind:value={name} on:keydown={handleKeydown} />
   <input type="text" placeholder="Enter Phone" bind:value={phone} on:keydown={handleKeydown} />
   <button on:click={search}>Search</button>
