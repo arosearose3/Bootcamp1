@@ -1,4 +1,6 @@
-# features 
+# features
+Delete Patient (trash icon) in Search results table. 
+
 Patient Add/Edit is a single component.  'Success' toast. Validation. Given and Family names. Cancel Button. Loading Indicator. Dropdown for Gender. 
 
 Choose from multiple public FHIR servers. 
